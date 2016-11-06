@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "829573963683",
+    "firebase_url": "https://pay2gether-30874.firebaseio.com",
+    "project_id": "pay2gether-30874",
+    "storage_bucket": "pay2gether-30874.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:829573963683:android:21a10dd7dbf6f4fb",
+        "android_client_info": {
+          "package_name": "pay2gether.maltedammann.com"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "829573963683-6vuu09l5bchqb9f5pj3pni95jh1pqbv8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "pay2gether.maltedammann.com",
+            "certificate_hash": "05C446EEC58AD45B621759539B614057E5677A03"
+          }
+        },
+        {
+          "client_id": "829573963683-8q2itmrqoanspm3q0p4c83d5mgk77pmn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3fHmQLzbh04LMJREeDwjZDNMGa2gGoWg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "829573963683-8q2itmrqoanspm3q0p4c83d5mgk77pmn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
