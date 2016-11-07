@@ -1,4 +1,4 @@
-package com.maltedammann.pay2gether.pay2gether.utils;
+package com.maltedammann.pay2gether.pay2gether.utils.extendables;
 
 import android.app.ProgressDialog;
 import android.support.annotation.VisibleForTesting;

@@ -24,7 +24,7 @@ import static com.maltedammann.pay2gether.pay2gether.main.MainActivity.PREF_UID;
 
 public class LogoutUtils {
 
-    private static DbUtils db = new DbUtils();
+    private static DbUtils db;
 
     public static Dialog showLogoutDeleteDialog(Context c, String text, final String posivitve) {
         AlertDialog.Builder myBuilder = new AlertDialog.Builder(c);
@@ -64,6 +64,7 @@ public class LogoutUtils {
     private static void delete(Context context) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser user = auth.getCurrentUser();
+        db  = new DbUtils(context);
         if (user != null) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             String mainUserKey = prefs.getString(PREF_UID, null);

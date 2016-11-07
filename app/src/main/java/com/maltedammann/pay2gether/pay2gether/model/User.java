@@ -28,6 +28,12 @@ public class User {
         this.mail = mail;
     }
 
+    public User(String id, String name, String mail) {
+        this.name = name;
+        this.mail = mail;
+        this.id = id;
+    }
+
     public String getId() {
         return id;
     }

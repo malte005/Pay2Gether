@@ -20,7 +20,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.maltedammann.pay2gether.pay2gether.R;
 import com.maltedammann.pay2gether.pay2gether.friends.FriendsActivity;
 import com.maltedammann.pay2gether.pay2gether.main.MainActivity;
-import com.maltedammann.pay2gether.pay2gether.utils.BaseActivity;
+import com.maltedammann.pay2gether.pay2gether.utils.extendables.BaseActivity;
 import com.maltedammann.pay2gether.pay2gether.utils.LogoutUtils;
 
 public class EventsActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {

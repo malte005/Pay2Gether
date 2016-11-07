@@ -15,7 +15,9 @@
 
     <!-- Progress Bar -->
     <string name="loading">Loading…</string>
-    <string name="deleting">Deleting your account…</string>
+    <string name="updating">Updating…</string>
+    <string name="deleting">Deleting…</string>
+    <string name="deleting_acct">Deleting your account…</string>
 
     <!-- Activity SignIn -->
     <string name="google_title_text">Sign In to Pay2Gether</string>

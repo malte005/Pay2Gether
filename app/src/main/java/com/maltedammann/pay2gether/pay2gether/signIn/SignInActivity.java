@@ -24,7 +24,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.maltedammann.pay2gether.pay2gether.R;
 import com.maltedammann.pay2gether.pay2gether.main.MainActivity;
-import com.maltedammann.pay2gether.pay2gether.utils.BaseActivity;
+import com.maltedammann.pay2gether.pay2gether.utils.extendables.BaseActivity;
 import com.maltedammann.pay2gether.pay2gether.utils.FirebaseRefFactory;
 
 public class SignInActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {

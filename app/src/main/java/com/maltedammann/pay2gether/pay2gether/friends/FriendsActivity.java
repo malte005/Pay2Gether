@@ -30,7 +30,7 @@ import com.maltedammann.pay2gether.pay2gether.events.EventsActivity;
 import com.maltedammann.pay2gether.pay2gether.main.MainActivity;
 import com.maltedammann.pay2gether.pay2gether.model.User;
 import com.maltedammann.pay2gether.pay2gether.utils.AddUserDialogFragment;
-import com.maltedammann.pay2gether.pay2gether.utils.BaseActivity;
+import com.maltedammann.pay2gether.pay2gether.utils.extendables.BaseActivity;
 import com.maltedammann.pay2gether.pay2gether.utils.FirebaseRefFactory;
 import com.maltedammann.pay2gether.pay2gether.utils.LogoutUtils;
 import com.maltedammann.pay2gether.pay2gether.utils.UIHelper;
@@ -80,7 +80,7 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
         setSupportActionBar(toolbar);
 
         mFirebaseUserRef = FirebaseRefFactory.getUsersRef();
-        db = new DbUtils();
+        db = new DbUtils(this);
 
         // View + adapter init
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_friends);

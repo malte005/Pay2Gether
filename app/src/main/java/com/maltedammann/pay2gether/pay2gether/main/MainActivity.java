@@ -28,7 +28,7 @@ import com.maltedammann.pay2gether.pay2gether.events.EventsActivity;
 import com.maltedammann.pay2gether.pay2gether.friends.FriendsActivity;
 import com.maltedammann.pay2gether.pay2gether.model.User;
 import com.maltedammann.pay2gether.pay2gether.signIn.SignInActivity;
-import com.maltedammann.pay2gether.pay2gether.utils.BaseActivity;
+import com.maltedammann.pay2gether.pay2gether.utils.extendables.BaseActivity;
 import com.maltedammann.pay2gether.pay2gether.utils.FirebaseRefFactory;
 import com.maltedammann.pay2gether.pay2gether.utils.LogoutUtils;
 
@@ -100,7 +100,7 @@ public class MainActivity extends BaseActivity
         };
 
         //DB Connection
-        dbUtils = new DbUtils();
+        dbUtils = new DbUtils(this);
 
         //Write Main-User
         getMainUser();
