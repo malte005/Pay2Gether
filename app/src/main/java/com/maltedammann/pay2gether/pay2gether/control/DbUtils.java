@@ -56,6 +56,7 @@ public class DbUtils implements ProgressDialogHandler{
                     System.out.println("Error deleting data: " + firebaseError.getMessage());
                 }
                 hideProgressDialog();
+                //UIHelper.snack(((Activity)context).findViewById(R.id.clFriends), userName + " deleted");
             }
         });
     }

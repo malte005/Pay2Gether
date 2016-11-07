@@ -79,6 +79,7 @@ public class LogoutUtils {
             SharedPreferences.Editor editor = prefs.edit();
             editor.clear();
             editor.commit();
+
             user.delete()
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override

@@ -12,6 +12,8 @@ import com.maltedammann.pay2gether.pay2gether.model.User;
 
 import java.util.List;
 
+import static com.maltedammann.pay2gether.pay2gether.friends.FriendsActivity.uid;
+
 /**
  * Created by damma on 03.11.2016.
  */
@@ -22,15 +24,15 @@ public class UserHolder extends RecyclerView.ViewHolder implements View.OnCreate
     private View mView;
     private List<User> users;
     public static String userName;
-    public TextView textViewUserName;
-    public CardView cv;
+    private TextView textViewUserName;
+    private CardView cv;
 
     //Constants
     public static final int CONTEXT_EDIT_ENTRY = 0;
     public static final int CONTEXT_DELETE_ENTRY = 1;
     public final int PROFILE_FRIEND = 124;
 
-    public UserHolder(View itemView, final List<User> users) {
+    public UserHolder(final View itemView, final List<User> users) {
         super(itemView);
         context = itemView.getContext();
         cv = (CardView) itemView.findViewById(R.id.card_view_user);
@@ -41,10 +43,11 @@ public class UserHolder extends RecyclerView.ViewHolder implements View.OnCreate
         itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                uid = v.getId();
+                System.out.println("IDXAXAXA: " + uid);
                 return false;
             }
         });
-        itemView.setOnCreateContextMenuListener(this);
 
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,6 +57,8 @@ public class UserHolder extends RecyclerView.ViewHolder implements View.OnCreate
                 context.startActivity(go2UserProfile);*/
             }
         });
+
+        itemView.setOnCreateContextMenuListener(this);
     }
 
     public void setAttributes(User user) {
@@ -68,6 +73,4 @@ public class UserHolder extends RecyclerView.ViewHolder implements View.OnCreate
         menu.add(0, CONTEXT_EDIT_ENTRY, 0, "Edit");
         menu.add(0, CONTEXT_DELETE_ENTRY, 0, "Delete");
     }
-
-
 }

@@ -17,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 
 import com.firebase.client.Firebase;
 import com.firebase.client.ValueEventListener;
@@ -30,17 +31,16 @@ import com.maltedammann.pay2gether.pay2gether.events.EventsActivity;
 import com.maltedammann.pay2gether.pay2gether.main.MainActivity;
 import com.maltedammann.pay2gether.pay2gether.model.User;
 import com.maltedammann.pay2gether.pay2gether.utils.AddUserDialogFragment;
-import com.maltedammann.pay2gether.pay2gether.utils.extendables.BaseActivity;
 import com.maltedammann.pay2gether.pay2gether.utils.FirebaseRefFactory;
 import com.maltedammann.pay2gether.pay2gether.utils.LogoutUtils;
 import com.maltedammann.pay2gether.pay2gether.utils.UIHelper;
+import com.maltedammann.pay2gether.pay2gether.utils.extendables.BaseActivity;
 import com.maltedammann.pay2gether.pay2gether.utils.interfaces.UserAddedHandler;
 
 import java.util.ArrayList;
 
 import static com.maltedammann.pay2gether.pay2gether.friends.UserHolder.CONTEXT_DELETE_ENTRY;
 import static com.maltedammann.pay2gether.pay2gether.friends.UserHolder.CONTEXT_EDIT_ENTRY;
-import static com.maltedammann.pay2gether.pay2gether.friends.UserHolder.userName;
 
 public class FriendsActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, UserAddedHandler {
 
@@ -55,6 +55,8 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
     private FirebaseAuth.AuthStateListener mAuthListener;
     Firebase mFirebaseUserRef;
     private ValueEventListener mUserListener;
+
+    public static int uid;
 
     //Constants
     private static final String TAG = FriendsActivity.class.getSimpleName();
@@ -100,6 +102,8 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
                     }
                 };*/
         mRecyclerView.setAdapter(adapter);
+
+        //registerForContextMenu(mRecyclerView);
 
         // Fab init
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_friends);
@@ -289,13 +293,16 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        //AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+//        int index = info.position;
+        //System.out.println("POSITION: " + index);
         switch (item.getItemId()) {
             case CONTEXT_EDIT_ENTRY:
 
                 break;
             case CONTEXT_DELETE_ENTRY:
-                UIHelper.snack(findViewById(R.id.clFriends), userName + " deleted");
+                //db.deleteUser("");
+                //UIHelper.snack(findViewById(R.id.clFriends), userName + " deleted");
                 break;
         }
         return super.onOptionsItemSelected(item);
