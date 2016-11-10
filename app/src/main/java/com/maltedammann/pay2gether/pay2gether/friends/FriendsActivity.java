@@ -11,18 +11,18 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 
-import com.firebase.client.Firebase;
-import com.firebase.client.ValueEventListener;
+import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.maltedammann.pay2gether.pay2gether.R;
@@ -31,8 +31,7 @@ import com.maltedammann.pay2gether.pay2gether.events.EventsActivity;
 import com.maltedammann.pay2gether.pay2gether.main.MainActivity;
 import com.maltedammann.pay2gether.pay2gether.model.User;
 import com.maltedammann.pay2gether.pay2gether.utils.AddUserDialogFragment;
-import com.maltedammann.pay2gether.pay2gether.utils.FirebaseRefFactory;
-import com.maltedammann.pay2gether.pay2gether.utils.LogoutUtils;
+import com.maltedammann.pay2gether.pay2gether.utils.AuthUtils;
 import com.maltedammann.pay2gether.pay2gether.utils.UIHelper;
 import com.maltedammann.pay2gether.pay2gether.utils.extendables.BaseActivity;
 import com.maltedammann.pay2gether.pay2gether.utils.interfaces.UserAddedHandler;
@@ -44,19 +43,17 @@ import static com.maltedammann.pay2gether.pay2gether.friends.UserHolder.CONTEXT_
 
 public class FriendsActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, UserAddedHandler {
 
-    ArrayList<User> users = new ArrayList<>();
+    // Object Holder
+    private ArrayList<User> users = new ArrayList<>();
 
     //DB
-    DbUtils db;
+    private DbUtils db;
 
-    //Firebase Stuff
+    //Firebase instance variables
     private FirebaseUser currentUser;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    Firebase mFirebaseUserRef;
-    private ValueEventListener mUserListener;
-
-    public static int uid;
+    private ChildEventListener mChildEventListener;
 
     //Constants
     private static final String TAG = FriendsActivity.class.getSimpleName();
@@ -70,62 +67,39 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
     private Intent intentContact = null;
 
     //UI
-    NavigationView navigationView;
-    RecyclerViewAdapter adapter;
-    RecyclerView mRecyclerView;
+    private NavigationView navigationView;
+    private RecyclerViewAdapter adapter;
+    private RecyclerView mRecyclerView;
+    private FloatingActionButton fab;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mFirebaseUserRef = FirebaseRefFactory.getUsersRef();
+        //DB Helper connection
         db = new DbUtils(this);
 
-        // View + adapter init
-        mRecyclerView = (RecyclerView) findViewById(R.id.rv_friends);
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new RecyclerViewAdapter(FriendsActivity.this, users);
-        /*adapter =
-                new FirebaseRecyclerAdapter<User, UserHolder>(
-                        User.class,
-                        android.R.layout.simple_list_item_1,
-                        UserHolder.class,
-                        mFirebaseUserRef
-                ) {
-                    @Override
-                    protected void populateViewHolder(UserHolder userViewHolder, User user, int i) {
-                        userViewHolder.setName(user.getName());
-                    }
-                };*/
-        mRecyclerView.setAdapter(adapter);
+        //DrawMenu init
+        setupDrawer();
 
-        //registerForContextMenu(mRecyclerView);
+        // View + adapter init
+        setupRecyclerView();
 
         // Fab init
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_friends);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent addFriend = new Intent(FriendsActivity.this, AddFriendActivity.class);
-                startActivityForResult(addFriend, ADD_FRIEND);
-            }
-        });
-
-        //DrawMenu init
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        navigationView.getMenu().getItem(2).setChecked(true);
+        setupFab();
 
         //Firebase Auth init
+        setupFirebase();
+    }
+
+    private void setupFirebase() {
+        /**
+         * Firebase - Auth
+         */
         mFirebaseAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -134,52 +108,123 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
                 if (currentUser != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + currentUser.getDisplayName());
+                    onSignInInitializer();
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
-                    finish();
+                    onSignOutCleanup();
+                    startActivityForResult(
+                            AuthUI.getInstance()
+                                    .createSignInIntentBuilder()
+                                    .setIsSmartLockEnabled(false)
+                                    .setProviders(
+                                            AuthUI.GOOGLE_PROVIDER,
+                                            AuthUI.EMAIL_PROVIDER,
+                                            AuthUI.FACEBOOK_PROVIDER
+                                    )
+                                    .build(),
+                            MainActivity.RC_SIGN_IN);
                 }
             }
         };
+    }
 
+    private void onSignOutCleanup() {
+        detachDatabaseListener();
+    }
+
+    private void onSignInInitializer() {
+        attachDatabaseReadListener();
+    }
+
+    private void attachDatabaseReadListener() {
         /**
          * Firebase - Read User
          */
-        db.db.child("users").addChildEventListener(new com.google.firebase.database.ChildEventListener() {
-            @Override
-            public void onChildAdded(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {
-                getAllUser(dataSnapshot, true);
+        if (mChildEventListener == null) {
+            mChildEventListener = new ChildEventListener() {
+                @Override
+                public void onChildAdded(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {
+                    getAllUser(dataSnapshot, true);
 //                Log.d(TAG, "onChildAdd:" + dataSnapshot.getValue(User.class).getName());
-            }
+                }
 
-            @Override
-            public void onChildChanged(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {
-                getAllUser(dataSnapshot, false);
-                Log.d(TAG, "onChildChanged:" + dataSnapshot.getValue(User.class).getName());
-            }
+                @Override
+                public void onChildChanged(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {
+                    getAllUser(dataSnapshot, false);
+                    Log.d(TAG, "onChildChanged:" + dataSnapshot.getValue(User.class).getName());
+                }
 
-            @Override
-            public void onChildRemoved(com.google.firebase.database.DataSnapshot dataSnapshot) {
-                Log.d(TAG, "onChildDeleted:" + dataSnapshot.getValue(User.class).getName());
-            }
+                @Override
+                public void onChildRemoved(com.google.firebase.database.DataSnapshot dataSnapshot) {
+                    Log.d(TAG, "onChildDeleted:" + dataSnapshot.getValue(User.class).getName());
+                    //getAllUser(dataSnapshot, false);
+                    User deleted = dataSnapshot.getValue(User.class);
+                    adapter.remove();
+                    adapter.notifyDataSetChanged();
+                }
 
-            @Override
-            public void onChildMoved(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {
-                Log.d(TAG, "onChildMoved:" + dataSnapshot.getValue(User.class).getName());
-            }
+                @Override
+                public void onChildMoved(com.google.firebase.database.DataSnapshot dataSnapshot, String s) {
+                    Log.d(TAG, "onChildMoved:" + dataSnapshot.getValue(User.class).getName());
+                }
 
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d(TAG, "onChildChanged:" + " CANCELED");
+                }
+            };
+
+            db.mFirebaseReference.child(db.USER_REF).addChildEventListener(mChildEventListener);
+        }
+    }
+
+    private void detachDatabaseListener() {
+        if (mChildEventListener != null) {
+            db.mFirebaseReference.child(db.USER_REF).removeEventListener(mChildEventListener);
+            mChildEventListener = null;
+        }
+    }
+
+    private void setupDrawer() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.getMenu().getItem(2).setChecked(true);
+    }
+
+    private void setupFab() {
+        fab = (FloatingActionButton) findViewById(R.id.fab_friends);
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d(TAG, "onChildChanged:" + " CANCELED");
+            public void onClick(View view) {
+                Intent addFriend = new Intent(FriendsActivity.this, AddFriendActivity.class);
+                startActivityForResult(addFriend, ADD_FRIEND);
             }
         });
+    }
+
+    private void setupRecyclerView() {
+        mRecyclerView = (RecyclerView) findViewById(R.id.rv_friends);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        adapter = new RecyclerViewAdapter(FriendsActivity.this, users);
+        mRecyclerView.setAdapter(adapter);
+
+        registerForContextMenu(mRecyclerView);
     }
 
     private void getAllUser(DataSnapshot dataSnapshot, boolean addUser) {
         if (dataSnapshot != null && dataSnapshot.getValue() != null) {
             try {
-                if (addUser)
+                if (addUser) {
                     users.add(dataSnapshot.getValue(User.class));
+                }
                 adapter = new RecyclerViewAdapter(FriendsActivity.this, users);
                 mRecyclerView.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
@@ -209,6 +254,7 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
         if (mAuthListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthListener);
         }
+        detachDatabaseListener();
     }
 
     @Override
@@ -217,6 +263,7 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
         if (mAuthListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthListener);
         }
+        detachDatabaseListener();
     }
 
     @Override
@@ -225,6 +272,7 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
         if (mAuthListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthListener);
         }
+        detachDatabaseListener();
         //adapter.cleanup();
     }
 
@@ -233,7 +281,6 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
         db.addUser(user);
         UIHelper.snack(findViewById(R.id.clFriends), user.getName() + " added");
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -279,10 +326,10 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
             finish();
         } else if (id == R.id.nav_friends) {
         } else if (id == R.id.nav_logout) {
-            alert = (AlertDialog) LogoutUtils.showLogoutDeleteDialog(this, getString(R.string.signOutText), getString(R.string.signOut));
+            alert = (AlertDialog) AuthUtils.showLogoutDeleteDialog(this, getString(R.string.signOutText), getString(R.string.signOut));
             alert.show();
         } else if (id == R.id.nav_delete_acc) {
-            alert = (AlertDialog) LogoutUtils.showLogoutDeleteDialog(this, getString(R.string.signOutDeleteUser), getString(R.string.signOutDelete));
+            alert = (AlertDialog) AuthUtils.showLogoutDeleteDialog(this, getString(R.string.signOutDeleteUser), getString(R.string.signOutDelete));
             alert.show();
         }
 
@@ -293,16 +340,16 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-//        int index = info.position;
-        //System.out.println("POSITION: " + index);
+        //AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        //int index = info.position;
+        User temp = adapter.getSelectedItem(item);
         switch (item.getItemId()) {
             case CONTEXT_EDIT_ENTRY:
-
                 break;
             case CONTEXT_DELETE_ENTRY:
-                //db.deleteUser("");
-                //UIHelper.snack(findViewById(R.id.clFriends), userName + " deleted");
+                db.deleteUser(temp.getId());
+                //UIHelper.snack(findViewById(R.id.clFriends), temp.getName() + " deleted");
+                adapter.notifyDataSetChanged();
                 break;
         }
         return super.onOptionsItemSelected(item);

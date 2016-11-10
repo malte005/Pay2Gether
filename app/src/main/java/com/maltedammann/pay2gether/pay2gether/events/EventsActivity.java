@@ -15,21 +15,27 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.maltedammann.pay2gether.pay2gether.R;
 import com.maltedammann.pay2gether.pay2gether.friends.FriendsActivity;
 import com.maltedammann.pay2gether.pay2gether.main.MainActivity;
+import com.maltedammann.pay2gether.pay2gether.utils.AuthUtils;
 import com.maltedammann.pay2gether.pay2gether.utils.extendables.BaseActivity;
-import com.maltedammann.pay2gether.pay2gether.utils.LogoutUtils;
+import com.maltedammann.pay2gether.pay2gether.utils.interfaces.ReadDataInterface;
 
-public class EventsActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class EventsActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ReadDataInterface {
 
+    //Firebase instance variables
     private FirebaseUser currentUser;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
-    NavigationView navigationView;
+    //UI
+    private NavigationView navigationView;
+    private FloatingActionButton fab;
+    private Toolbar toolbar;
 
     private static final String TAG = EventsActivity.class.getSimpleName();
 
@@ -37,18 +43,17 @@ public class EventsActivity extends BaseActivity implements NavigationView.OnNav
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_events);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_events);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        // Fab init
+        setupFab();
 
+        //DrawMenu init
+        setupDrawer();
+    }
+
+    private void setupDrawer() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -58,7 +63,23 @@ public class EventsActivity extends BaseActivity implements NavigationView.OnNav
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.getMenu().getItem(1).setChecked(true);
+    }
 
+    private void setupFab() {
+        fab = (FloatingActionButton) findViewById(R.id.fab_events);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+    }
+
+    private void setupFirebase() {
+        /**
+         * Firebase - Auth
+         */
         mFirebaseAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -67,14 +88,41 @@ public class EventsActivity extends BaseActivity implements NavigationView.OnNav
                 if (currentUser != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + currentUser.getDisplayName());
+                    onSignInInitializer();
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
-                    finish();
+                    onSignOutCleanup();
+                    startActivityForResult(
+                            AuthUI.getInstance()
+                                    .createSignInIntentBuilder()
+                                    .setIsSmartLockEnabled(false)
+                                    .setProviders(
+                                            AuthUI.GOOGLE_PROVIDER,
+                                            AuthUI.EMAIL_PROVIDER,
+                                            AuthUI.FACEBOOK_PROVIDER
+                                    )
+                                    .build(),
+                            MainActivity.RC_SIGN_IN);
                 }
             }
         };
     }
+
+    public void onSignOutCleanup() {
+        detachDatabaseListener();
+    }
+
+    public void onSignInInitializer() {
+        attachDatabaseReadListener();
+    }
+
+    public void attachDatabaseReadListener() {
+    }
+
+    public void detachDatabaseListener() {
+    }
+
 
     @Override
     public void onStart() {
@@ -121,10 +169,10 @@ public class EventsActivity extends BaseActivity implements NavigationView.OnNav
             startActivity(openFriends);
             finish();
         } else if (id == R.id.nav_logout) {
-            alert = (AlertDialog) LogoutUtils.showLogoutDeleteDialog(this, getString(R.string.signOutText), getString(R.string.signOut));
+            alert = (AlertDialog) AuthUtils.showLogoutDeleteDialog(this, getString(R.string.signOutText), getString(R.string.signOut));
             alert.show();
         } else if (id == R.id.nav_delete_acc) {
-            alert = (AlertDialog) LogoutUtils.showLogoutDeleteDialog(this, getString(R.string.signOutDeleteUser), getString(R.string.signOutDelete));
+            alert = (AlertDialog) AuthUtils.showLogoutDeleteDialog(this, getString(R.string.signOutDeleteUser), getString(R.string.signOutDelete));
             alert.show();
         }
 

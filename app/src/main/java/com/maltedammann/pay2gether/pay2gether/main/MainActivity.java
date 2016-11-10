@@ -15,48 +15,70 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.firebase.client.Firebase;
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.maltedammann.pay2gether.pay2gether.R;
 import com.maltedammann.pay2gether.pay2gether.control.DbUtils;
 import com.maltedammann.pay2gether.pay2gether.events.EventsActivity;
 import com.maltedammann.pay2gether.pay2gether.friends.FriendsActivity;
 import com.maltedammann.pay2gether.pay2gether.model.User;
-import com.maltedammann.pay2gether.pay2gether.signIn.SignInActivity;
+import com.maltedammann.pay2gether.pay2gether.utils.AuthUtils;
 import com.maltedammann.pay2gether.pay2gether.utils.extendables.BaseActivity;
-import com.maltedammann.pay2gether.pay2gether.utils.FirebaseRefFactory;
-import com.maltedammann.pay2gether.pay2gether.utils.LogoutUtils;
+import com.maltedammann.pay2gether.pay2gether.utils.interfaces.ReadDataInterface;
 
 public class MainActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, ReadDataInterface {
 
+    //Firebase instance variables
     private FirebaseUser currentUser;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private Firebase mRef = FirebaseRefFactory.getUsersRef();
-    DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("user");
-    DbUtils dbUtils;
 
-    NavigationView navigationView;
+    //DB connection
+    private DbUtils dbUtils;
+
+    //UI
+    private Toolbar toolbar;
+    private NavigationView navigationView;
     private AdView mAdView;
+
+    //Instance variables
     private User user;
-    private static final String TAG = MainActivity.class.getSimpleName();
     private SharedPreferences prefs;
 
+    //Constants
+    private static final String TAG = MainActivity.class.getSimpleName();
     public static final String PREF_UID = "userKey";
+    public static final int RC_SIGN_IN = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //DrawMenu init
+        setupDrawer();
+
+        //DB Connection
+        dbUtils = new DbUtils(this);
+
+        // AdMob
+        setUpAdMob();
+
+        //Initialize Firebase Auth
+        setUpFirebase();
+
+        //Write Main-User
+        getMainUser();
+    }
+
+    private void setupDrawer() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -66,8 +88,43 @@ public class MainActivity extends BaseActivity
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.getMenu().getItem(0).setChecked(true);
+    }
 
-        // AdMob
+    private void setUpFirebase() {
+        /**
+         * Firebase - Auth
+         */
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                currentUser = firebaseAuth.getCurrentUser();
+                if (currentUser != null) {
+                    // User is signed in
+                    Log.d(TAG, "onAuthStateChanged:signed_in:" + currentUser.getDisplayName());
+                    onSignInInitializer();
+                } else {
+                    // User is signed out
+                    Log.d(TAG, "onAuthStateChanged:signed_out");
+                    onSignOutCleanup();
+                    startActivityForResult(
+                            AuthUI.getInstance()
+                                    .createSignInIntentBuilder()
+                                    .setIsSmartLockEnabled(false)
+                                    .setProviders(
+                                            AuthUI.GOOGLE_PROVIDER,
+                                            AuthUI.EMAIL_PROVIDER,
+                                            AuthUI.FACEBOOK_PROVIDER
+                                    )
+                                    .build(),
+                            MainActivity.RC_SIGN_IN);
+                }
+            }
+        };
+    }
+
+    private void setUpAdMob() {
+        MobileAds.initialize(getApplicationContext(), getString(R.string.banner_ad_unit_id));
         mAdView = (AdView) findViewById(R.id.adView);
 
         // Create an ad request. Check your logcat output for the hashed device ID to
@@ -79,32 +136,32 @@ public class MainActivity extends BaseActivity
 
         // Start loading the ad in the background.
         mAdView.loadAd(adRequest);
+    }
 
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                currentUser = firebaseAuth.getCurrentUser();
-                if (currentUser != null) {
-                    // User is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + currentUser.getDisplayName());
+    public void onSignOutCleanup() {
+        detachDatabaseListener();
+    }
 
-                } else {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
-                    Intent logout = new Intent(MainActivity.this, SignInActivity.class);
-                    finish();
-                    startActivity(logout);
-                }
+    public void onSignInInitializer() {
+        attachDatabaseReadListener();
+    }
+
+    public void attachDatabaseReadListener() {
+
+    }
+
+    public void detachDatabaseListener() {
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_SIGN_IN) {
+            if (resultCode == RESULT_CANCELED) {
+                finish();
             }
-        };
-
-        //DB Connection
-        dbUtils = new DbUtils(this);
-
-        //Write Main-User
-        getMainUser();
-
+        }
     }
 
     @Override
@@ -207,10 +264,10 @@ public class MainActivity extends BaseActivity
             Intent openFriends = new Intent(this, FriendsActivity.class);
             startActivity(openFriends);
         } else if (id == R.id.nav_logout) {
-            alert = (AlertDialog) LogoutUtils.showLogoutDeleteDialog(this, getString(R.string.signOutText), getString(R.string.signOut));
+            alert = (AlertDialog) AuthUtils.showLogoutDeleteDialog(this, getString(R.string.signOutText), getString(R.string.signOut));
             alert.show();
         } else if (id == R.id.nav_delete_acc) {
-            alert = (AlertDialog) LogoutUtils.showLogoutDeleteDialog(this, getString(R.string.signOutDeleteUser), getString(R.string.signOutDelete));
+            alert = (AlertDialog) AuthUtils.showLogoutDeleteDialog(this, getString(R.string.signOutDeleteUser), getString(R.string.signOutDelete));
             alert.show();
         }
 
@@ -232,9 +289,7 @@ public class MainActivity extends BaseActivity
     public String getMainUser() {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String mainUserKey = prefs.getString(PREF_UID, null);
-        System.out.println("MAINUSER:" + mainUserKey);
         if (mainUserKey == null) {
-            System.out.println("MAINUSER ist null :" + mainUserKey);
             User main = new User(mFirebaseAuth.getCurrentUser().getDisplayName(), mFirebaseAuth.getCurrentUser().getEmail());
             mainUserKey = dbUtils.addUser(main);
             main.setId(mainUserKey);

@@ -22,7 +22,7 @@ import static com.maltedammann.pay2gether.pay2gether.main.MainActivity.PREF_UID;
  * Created by damma on 24.10.2016.
  */
 
-public class LogoutUtils {
+public class AuthUtils {
 
     private static DbUtils db;
 
@@ -62,9 +62,9 @@ public class LogoutUtils {
     }
 
     private static void delete(Context context) {
+        db = new DbUtils(context);
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser user = auth.getCurrentUser();
-        db  = new DbUtils(context);
         if (user != null) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             String mainUserKey = prefs.getString(PREF_UID, null);
@@ -72,7 +72,7 @@ public class LogoutUtils {
             try {
                 db.deleteUser(mainUserKey);
             } catch (NullPointerException ex) {
-                Log.d("LogoutUtils", ex.toString());
+                Log.d("AuthUtils", ex.toString());
             }
 
             //Delete user from sharePrefs
@@ -86,7 +86,7 @@ public class LogoutUtils {
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
                                 FirebaseAuth.getInstance().signOut();
-                                Log.d("LogoutUtils", "User account deleted.");
+                                Log.d("AuthUtils", "User account deleted.");
                             }
                         }
                     });
