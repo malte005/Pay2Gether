@@ -59,7 +59,7 @@ public class MainActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar_userProfile);
         setSupportActionBar(toolbar);
 
         //DrawMenu init
@@ -289,15 +289,17 @@ public class MainActivity extends BaseActivity
     public String getMainUser() {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String mainUserKey = prefs.getString(PREF_UID, null);
-        if (mainUserKey == null) {
-            User main = new User(mFirebaseAuth.getCurrentUser().getDisplayName(), mFirebaseAuth.getCurrentUser().getEmail());
-            mainUserKey = dbUtils.addUser(main);
-            main.setId(mainUserKey);
-            System.out.println("MAINUSER war null :" + mainUserKey);
+        if (mFirebaseAuth.getCurrentUser() != null) {
+            if (mainUserKey == null) {
+                User main = new User(mFirebaseAuth.getCurrentUser().getDisplayName(), mFirebaseAuth.getCurrentUser().getEmail());
+                mainUserKey = dbUtils.addUser(main);
+                main.setId(mainUserKey);
+                System.out.println("MAINUSER war null :" + mainUserKey);
 
-            SharedPreferences.Editor prefEditor = prefs.edit();
-            prefEditor.putString(PREF_UID, mainUserKey);
-            prefEditor.apply();
+                SharedPreferences.Editor prefEditor = prefs.edit();
+                prefEditor.putString(PREF_UID, mainUserKey);
+                prefEditor.apply();
+            }
         }
         return mainUserKey;
     }

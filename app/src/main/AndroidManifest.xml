@@ -21,13 +21,7 @@
         <activity
             android:name=".signIn.SignInActivity"
             android:launchMode="singleTask"
-            android:theme="@style/ThemeOverlay.MyNoTitleActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/ThemeOverlay.MyNoTitleActivity" />
 
         <service android:name=".services.MyFirebaseMessagingService">
             <intent-filter>
@@ -39,7 +33,13 @@
             android:name=".main.MainActivity"
             android:label="@string/title_activity_main"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".events.EventsActivity"
             android:label="@string/title_activity_events"
@@ -59,9 +59,13 @@
         <activity
             android:name=".friends.UserProfileActivity"
             android:label="@string/title_activity_user_profile"
-            android:parentActivityName=".friends.FriendsActivity"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:parentActivityName=".friends.FriendsActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".friends.EditFriendActivity"
+            android:label="@string/title_activity_user_edit"
+            android:parentActivityName=".friends.FriendsActivity" />
     </application>
 
 </manifest>

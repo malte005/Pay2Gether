@@ -8,11 +8,24 @@
     tools:context="com.maltedammann.pay2gether.pay2gether.friends.UserProfileActivity"
     tools:showIn="@layout/activity_user_profile">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:id="@+id/text"
-        android:text="@string/large_text" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/summary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:textSize="24dp"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:text=" gets 100€"
+            android:paddingTop="24dp"
+            android:paddingBottom="24dp" />
+
+    </LinearLayout>
+
 
 </android.support.v4.widget.NestedScrollView>

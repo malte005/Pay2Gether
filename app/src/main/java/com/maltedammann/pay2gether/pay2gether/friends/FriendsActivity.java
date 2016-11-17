@@ -8,6 +8,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
@@ -58,6 +59,7 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
     //Constants
     private static final String TAG = FriendsActivity.class.getSimpleName();
     public static final String INTENT_DISPLAY_NAME = "display_name";
+    public static final String INTENT_USER_ID = "user_id";
     private final int ADD_FRIEND = 123;
 
     //Result add Friend
@@ -72,12 +74,13 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
     private RecyclerView mRecyclerView;
     private FloatingActionButton fab;
     private Toolbar toolbar;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar_userProfile);
         setSupportActionBar(toolbar);
 
         //DB Helper connection
@@ -94,6 +97,25 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
 
         //Firebase Auth init
         setupFirebase();
+
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshList();
+                UIHelper.snack(findViewById(R.id.clFriends), "Refreshed");
+            }
+        });
+    }
+
+    private void refreshList() {
+        // showing refresh animation before making http call
+        swipeRefreshLayout.setRefreshing(true);
+
+        adapter.notifyDataSetChanged();
+
+        // stopping swipe refresh
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     private void setupFirebase() {
@@ -161,7 +183,6 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
                     //getAllUser(dataSnapshot, false);
                     User deleted = dataSnapshot.getValue(User.class);
                     adapter.remove();
-                    adapter.notifyDataSetChanged();
                 }
 
                 @Override
@@ -345,6 +366,10 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
         User temp = adapter.getSelectedItem(item);
         switch (item.getItemId()) {
             case CONTEXT_EDIT_ENTRY:
+                Intent go2Edit = new Intent(FriendsActivity.this, EditFriendActivity.class);
+                System.out.println("IDIDIDID:" + temp.getId());
+                go2Edit.putExtra(INTENT_USER_ID, temp.getId());
+                startActivity(go2Edit);
                 break;
             case CONTEXT_DELETE_ENTRY:
                 db.deleteUser(temp.getId());

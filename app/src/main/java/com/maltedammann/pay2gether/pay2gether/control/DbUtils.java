@@ -80,7 +80,7 @@ public class DbUtils implements ProgressDialogHandler {
 
     public void editUser(User user) {
         pd = new ProgressDialog(context);
-        showProgressDialog(context.getResources().getString(R.string.updating));
+        //showProgressDialog(context.getResources().getString(R.string.updating));
 
         mFirebaseUserRef = FirebaseRefFactory.getUsersRef();
 
@@ -105,7 +105,7 @@ public class DbUtils implements ProgressDialogHandler {
                 if (firebaseError != null) {
                     System.out.println("Error updating data: " + firebaseError.getMessage());
                 }
-                hideProgressDialog();
+                //hideProgressDialog();
             }
         });
 

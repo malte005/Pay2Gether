@@ -37,13 +37,14 @@ public class EventsActivity extends BaseActivity implements NavigationView.OnNav
     private FloatingActionButton fab;
     private Toolbar toolbar;
 
+    //Constants
     private static final String TAG = EventsActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_events);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar_userProfile);
         setSupportActionBar(toolbar);
 
         // Fab init
@@ -51,6 +52,9 @@ public class EventsActivity extends BaseActivity implements NavigationView.OnNav
 
         //DrawMenu init
         setupDrawer();
+
+        //Firebase init
+        setupFirebase();
     }
 
     private void setupDrawer() {

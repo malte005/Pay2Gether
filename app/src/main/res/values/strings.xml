@@ -45,8 +45,13 @@
     <!-- Activity AddFriends -->
     <string name="title_activity_friends_add">Add Friend</string>
 
-    <string name="action_settings">Settings</string>
+    <!-- Activity Friend Profile -->
     <string name="title_activity_user_profile">Friend Profile</string>
+
+    <!-- Activity Friend Edit -->
+    <string name="title_activity_user_edit">Edit Friend</string>
+
+    <string name="action_save">Save</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 

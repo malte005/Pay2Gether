@@ -1,5 +1,6 @@
 package com.maltedammann.pay2gether.pay2gether.friends;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -7,45 +8,41 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.database.DatabaseError;
 import com.maltedammann.pay2gether.pay2gether.R;
+import com.maltedammann.pay2gether.pay2gether.control.DbUtils;
 import com.maltedammann.pay2gether.pay2gether.model.User;
-import com.maltedammann.pay2gether.pay2gether.utils.FirebaseRefFactory;
 
 public class UserProfileActivity extends AppCompatActivity {
 
     // UI
-    Toolbar toolbar;
-    FloatingActionButton fab;
+    private Toolbar toolbar;
+    private FloatingActionButton fab;
 
-    // Firebase
-    Firebase userRef;
+    private String userID;
 
-    private User user;
+    //DB
+    private DbUtils dbUtils;
+
+    private User user = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar_userProfile);
         setSupportActionBar(toolbar);
 
-        // Fab init
-        setupFab();
-
+        //UI
         TextView text = (TextView) findViewById(R.id.text);
-
+        //get user ID
+        userID = getIntent().getStringExtra(FriendsActivity.INTENT_USER_ID);
+        //DB init
+        dbUtils = new DbUtils(this);
         // User init
         getUser();
-
-
-        // UI
-        //this.setTitle(user.getName().toString());
-        //System.out.println("NAME: " + user.getName());
-        //text.setText(user.getName());
+        // Fab init
+        setupFab();
 
     }
 
@@ -54,27 +51,33 @@ public class UserProfileActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent go2Edit = new Intent(UserProfileActivity.this, EditFriendActivity.class);
+                go2Edit.putExtra(FriendsActivity.INTENT_USER_ID, userID);
+                startActivity(go2Edit);
             }
         });
     }
 
-    public void getUser() {
-        final String id = getIntent().getStringExtra(RecyclerViewAdapter.INTENT_USER_ID);
-        System.out.println("DRIN ID: " + id);
-        userRef = FirebaseRefFactory.getUsersRef();
-        userRef.child(id).addValueEventListener(new ValueEventListener() {
+    private void getUser() {
+        dbUtils.mFirebaseReference.child(dbUtils.USER_REF).child(userID).addValueEventListener(new com.google.firebase.database.ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                //User data = snapshot.getValue(User.class);
-                //System.out.println("User: " + data.toString());
-                //toolbar.setTitle(data.getName());
-                //getSupportActionBar().setTitle(data.getName());
+            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                user = snapshot.getValue(User.class);
+                System.out.println("USER: " + user.toString());
+                if (user.getName() != null) {
+                    setToolbar(); //TODO geht noch nicht
+                }
+
             }
 
             @Override
-            public void onCancelled(FirebaseError error) {
-                System.out.println("ERROR: " + error);
+            public void onCancelled(DatabaseError databaseError) {
             }
         });
+
+    }
+
+    private void setToolbar() {
+        getSupportActionBar().setTitle(user.getName());
     }
 }

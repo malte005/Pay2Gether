@@ -71,10 +71,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<UserHolder> {
     }
 
     public void remove() {
-        System.out.println("CURRENT: " + currentPosition);
         users.remove(currentPosition);
         this.notifyItemRemoved(currentPosition);
-        this.notifyItemRangeChanged(currentPosition, getItemCount());
+        //this.notifyItemRangeChanged(currentPosition, getItemCount());
         notifyDataSetChanged();
     }
 
