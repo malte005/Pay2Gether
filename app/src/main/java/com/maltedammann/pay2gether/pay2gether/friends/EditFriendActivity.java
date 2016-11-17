@@ -51,7 +51,7 @@ public class EditFriendActivity extends AppCompatActivity {
     }
 
     private void setupFirebase() {
-        dbUtils.mFirebaseReference.child(dbUtils.USER_REF).child(userID).addValueEventListener(new ValueEventListener() {
+        dbUtils.mFirebaseDbReference.child(dbUtils.USER_REF).child(userID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 user = snapshot.getValue(User.class);

@@ -17,6 +17,10 @@ public class Event {
     public Event() {
     }
 
+    public Event(String title) {
+        this.title = title;
+    }
+
     public Event(Date date, String title) {
         this.date = date;
         this.title = title;

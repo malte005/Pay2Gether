@@ -18,7 +18,7 @@ import java.util.List;
  * Created by damma on 03.11.2016.
  */
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<UserHolder> {
+public class RecyclerViewAdapterUser extends RecyclerView.Adapter<UserHolder> {
     private List<User> users;
     protected Context context;
     private User currentUser;
@@ -26,7 +26,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<UserHolder> {
     // Constants
     public static final String INTENT_USER_ID = "user_id";
 
-    public RecyclerViewAdapter(Context context, List<User> users) {
+    public RecyclerViewAdapterUser(Context context, List<User> users) {
         this.context = context;
         this.users = users;
     }

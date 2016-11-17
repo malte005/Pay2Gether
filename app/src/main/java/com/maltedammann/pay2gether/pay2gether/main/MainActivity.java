@@ -112,9 +112,9 @@ public class MainActivity extends BaseActivity
                                     .createSignInIntentBuilder()
                                     .setIsSmartLockEnabled(false)
                                     .setProviders(
-                                            AuthUI.GOOGLE_PROVIDER,
-                                            AuthUI.EMAIL_PROVIDER,
-                                            AuthUI.FACEBOOK_PROVIDER
+                                            AuthUI.GOOGLE_PROVIDER
+                                            , AuthUI.EMAIL_PROVIDER
+                                            //,AuthUI.FACEBOOK_PROVIDER
                                     )
                                     .build(),
                             MainActivity.RC_SIGN_IN);

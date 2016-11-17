@@ -36,7 +36,7 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
     private FirebaseAnalytics mFirebaseAnalytics;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    Firebase mRef = FirebaseRefFactory.getUsersRef();
+    Firebase mRef = FirebaseRefFactory.getRef("users");
 
     private final static String TAG = "SignInActivity";
 

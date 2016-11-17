@@ -13,4 +13,9 @@
     tools:context="com.maltedammann.pay2gether.pay2gether.events.EventsActivity"
     tools:showIn="@layout/activity_events">
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_events"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </RelativeLayout>

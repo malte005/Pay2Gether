@@ -32,6 +32,7 @@ public class UserProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_profile);
         toolbar = (Toolbar) findViewById(R.id.toolbar_userProfile);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //UI
         TextView text = (TextView) findViewById(R.id.text);
@@ -59,7 +60,7 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void getUser() {
-        dbUtils.mFirebaseReference.child(dbUtils.USER_REF).child(userID).addValueEventListener(new com.google.firebase.database.ValueEventListener() {
+        dbUtils.mFirebaseDbReference.child(dbUtils.USER_REF).child(userID).addValueEventListener(new com.google.firebase.database.ValueEventListener() {
             @Override
             public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
                 user = snapshot.getValue(User.class);

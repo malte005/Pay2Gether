@@ -18,8 +18,4 @@ public class FirebaseRefFactory {
     }
 
     public static Firebase getRef() { return getRef(null); }
-
-    public static Firebase getUsersRef() { return getRef("users"); }
-
-
 }

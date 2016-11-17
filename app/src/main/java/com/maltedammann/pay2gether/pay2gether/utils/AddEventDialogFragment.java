@@ -11,31 +11,21 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.maltedammann.pay2gether.pay2gether.R;
-import com.maltedammann.pay2gether.pay2gether.model.User;
+import com.maltedammann.pay2gether.pay2gether.model.Event;
 import com.maltedammann.pay2gether.pay2gether.utils.interfaces.ItemAddedHandler;
 
 /**
- * Created by damma on 26.10.2016.
+ * Created by damma on 17.11.2016.
  */
 
-public class AddUserDialogFragment extends AppCompatDialogFragment {
+public class AddEventDialogFragment extends AppCompatDialogFragment {
 
-    private String name;
-    private String mail;
+    private String title;
     ItemAddedHandler mUserAddedHandler;
 
-    public AddUserDialogFragment() {
+    public AddEventDialogFragment() {
         super();
-    }
-
-    public static AddUserDialogFragment newInstance(String name, String mail) {
-        AddUserDialogFragment f = new AddUserDialogFragment();
-        f.setCancelable(false);
-        Bundle args = new Bundle();
-        args.putString("name", name);
-        args.putString("mail", mail);
-        f.setArguments(args);
-        return f;
+        setCancelable(false);
     }
 
     @Override
@@ -43,33 +33,24 @@ public class AddUserDialogFragment extends AppCompatDialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        //get passed argument name
-        name = getArguments().getString("name");
-        mail = getArguments().getString("create");
-
-        final View dialogView = inflater.inflate(R.layout.add_dialog_friend, null);
-        final TextView username = (TextView) dialogView.findViewById(R.id.addUserName);
-        final TextView usermail = (TextView) dialogView.findViewById(R.id.addUserMail);
-
-        username.setText(name);
+        final View dialogView = inflater.inflate(R.layout.add_dialog_event, null);
+        final TextView eventname = (TextView) dialogView.findViewById(R.id.addUserName);
 
         builder.setView(dialogView)
-                .setMessage(R.string.dialog_add_friend_msg)
+                .setMessage(R.string.dialog_add_event_msg)
                 .setPositiveButton(R.string.dialog_add_btn, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        if (username.getText().length() == 0) {
+                        if (eventname.getText().length() == 0) {
                             //username.setHint(getResources().getString(R.string.dialog_add_friend_error));
-                            username.setError(getResources().getString(R.string.dialog_add_friend_error));
-                            username.requestFocus();
+                            eventname.setError(getResources().getString(R.string.dialog_add_friend_error));
+                            eventname.requestFocus();
                         } else {
-                            User user;
-                            if (usermail.getText().toString().equals("") || usermail == null) {
-                                user = new User(username.getText().toString());
-                            } else {
-                                user = new User(username.getText().toString(), usermail.getText().toString());
+                            Event event;
+                            if (eventname.getText().toString().equals("") || eventname == null) {
+                                event = new Event(eventname.getText().toString());
+                                mUserAddedHandler.onItemAdded(event);
                             }
-                            mUserAddedHandler.onItemAdded(user);
                             dismiss();
                         }
                     }

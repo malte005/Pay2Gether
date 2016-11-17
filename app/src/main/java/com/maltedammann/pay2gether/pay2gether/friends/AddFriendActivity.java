@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -21,6 +22,7 @@ public class AddFriendActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = AddFriendActivity.class.getSimpleName();
+    private Toolbar toolbar;
     Intent returnIntent;
 
     /**
@@ -49,6 +51,10 @@ public class AddFriendActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_friend);
+        toolbar = (Toolbar) findViewById(R.id.toolbar_addUser);
+        toolbar.setNavigationIcon(R.drawable.ic_close);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Initialize the adapter
         adapter = new SimpleCursorAdapter(this,

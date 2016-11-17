@@ -35,14 +35,14 @@ import com.maltedammann.pay2gether.pay2gether.utils.AddUserDialogFragment;
 import com.maltedammann.pay2gether.pay2gether.utils.AuthUtils;
 import com.maltedammann.pay2gether.pay2gether.utils.UIHelper;
 import com.maltedammann.pay2gether.pay2gether.utils.extendables.BaseActivity;
-import com.maltedammann.pay2gether.pay2gether.utils.interfaces.UserAddedHandler;
+import com.maltedammann.pay2gether.pay2gether.utils.interfaces.ItemAddedHandler;
 
 import java.util.ArrayList;
 
 import static com.maltedammann.pay2gether.pay2gether.friends.UserHolder.CONTEXT_DELETE_ENTRY;
 import static com.maltedammann.pay2gether.pay2gether.friends.UserHolder.CONTEXT_EDIT_ENTRY;
 
-public class FriendsActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, UserAddedHandler {
+public class FriendsActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ItemAddedHandler {
 
     // Object Holder
     private ArrayList<User> users = new ArrayList<>();
@@ -70,7 +70,7 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
 
     //UI
     private NavigationView navigationView;
-    private RecyclerViewAdapter adapter;
+    private RecyclerViewAdapterUser adapter;
     private RecyclerView mRecyclerView;
     private FloatingActionButton fab;
     private Toolbar toolbar;
@@ -98,6 +98,11 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
         //Firebase Auth init
         setupFirebase();
 
+        //Refresh by pull down
+        setupPullRefresh();
+    }
+
+    private void setupPullRefresh() {
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -140,9 +145,9 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
                                     .createSignInIntentBuilder()
                                     .setIsSmartLockEnabled(false)
                                     .setProviders(
-                                            AuthUI.GOOGLE_PROVIDER,
-                                            AuthUI.EMAIL_PROVIDER,
-                                            AuthUI.FACEBOOK_PROVIDER
+                                            AuthUI.GOOGLE_PROVIDER
+                                            , AuthUI.EMAIL_PROVIDER
+                                            //,AuthUI.FACEBOOK_PROVIDER
                                     )
                                     .build(),
                             MainActivity.RC_SIGN_IN);
@@ -196,13 +201,13 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
                 }
             };
 
-            db.mFirebaseReference.child(db.USER_REF).addChildEventListener(mChildEventListener);
+            db.mFirebaseDbReference.child(db.USER_REF).addChildEventListener(mChildEventListener);
         }
     }
 
     private void detachDatabaseListener() {
         if (mChildEventListener != null) {
-            db.mFirebaseReference.child(db.USER_REF).removeEventListener(mChildEventListener);
+            db.mFirebaseDbReference.child(db.USER_REF).removeEventListener(mChildEventListener);
             mChildEventListener = null;
         }
     }
@@ -234,7 +239,7 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        adapter = new RecyclerViewAdapter(FriendsActivity.this, users);
+        adapter = new RecyclerViewAdapterUser(FriendsActivity.this, users);
         mRecyclerView.setAdapter(adapter);
 
         registerForContextMenu(mRecyclerView);
@@ -246,7 +251,7 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
                 if (addUser) {
                     users.add(dataSnapshot.getValue(User.class));
                 }
-                adapter = new RecyclerViewAdapter(FriendsActivity.this, users);
+                adapter = new RecyclerViewAdapterUser(FriendsActivity.this, users);
                 mRecyclerView.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
             } catch (Exception ex) {
@@ -298,9 +303,10 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
     }
 
     @Override
-    public void onItemAdded(User user) {
-        db.addUser(user);
-        UIHelper.snack(findViewById(R.id.clFriends), user.getName() + " added");
+    public void onItemAdded(Object user) {
+        User newUser = (User) user;
+        db.addUser(newUser);
+        UIHelper.snack(findViewById(R.id.clFriends), newUser.getName() + " added");
     }
 
     @Override

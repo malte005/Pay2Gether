@@ -53,19 +53,44 @@
         <activity
             android:name=".friends.AddFriendActivity"
             android:label="@string/title_activity_friends_add"
-            android:launchMode="singleTask"
             android:parentActivityName=".friends.AddFriendActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.maltedammann.pay2gether.pay2gether.friends.FriendsActivity" />
+        </activity>
         <activity
             android:name=".friends.UserProfileActivity"
             android:label="@string/title_activity_user_profile"
             android:launchMode="singleTask"
             android:parentActivityName=".friends.FriendsActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.maltedammann.pay2gether.pay2gether.friends.FriendsActivity" />
+        </activity>
         <activity
             android:name=".friends.EditFriendActivity"
             android:label="@string/title_activity_user_edit"
             android:parentActivityName=".friends.FriendsActivity" />
+        <activity
+            android:name=".events.EventProfileActivity"
+            android:label="@string/title_activity_event_profile"
+            android:parentActivityName=".events.EventsActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.maltedammann.pay2gether.pay2gether.events.EventsActivity" />
+        </activity>
+        <activity
+            android:name=".events.EditEventActivity"
+            android:label="@string/title_activity_event_edit"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".events.EventsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.maltedammann.pay2gether.pay2gether.events.EventsActivity" />
+        </activity>
     </application>
 
 </manifest>
