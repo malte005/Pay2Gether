@@ -20,8 +20,7 @@ import com.maltedammann.pay2gether.pay2gether.utils.interfaces.ItemAddedHandler;
 
 public class AddEventDialogFragment extends AppCompatDialogFragment {
 
-    private String title;
-    ItemAddedHandler mUserAddedHandler;
+    ItemAddedHandler mEventAddedHandler;
 
     public AddEventDialogFragment() {
         super();
@@ -34,7 +33,7 @@ public class AddEventDialogFragment extends AppCompatDialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
         final View dialogView = inflater.inflate(R.layout.add_dialog_event, null);
-        final TextView eventname = (TextView) dialogView.findViewById(R.id.addUserName);
+        final TextView eventname = (TextView) dialogView.findViewById(R.id.addEventTitle);
 
         builder.setView(dialogView)
                 .setMessage(R.string.dialog_add_event_msg)
@@ -43,14 +42,12 @@ public class AddEventDialogFragment extends AppCompatDialogFragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         if (eventname.getText().length() == 0) {
                             //username.setHint(getResources().getString(R.string.dialog_add_friend_error));
-                            eventname.setError(getResources().getString(R.string.dialog_add_friend_error));
+                            eventname.setError(getResources().getString(R.string.dialog_add_event_error));
                             eventname.requestFocus();
                         } else {
-                            Event event;
-                            if (eventname.getText().toString().equals("") || eventname == null) {
-                                event = new Event(eventname.getText().toString());
-                                mUserAddedHandler.onItemAdded(event);
-                            }
+                            Event event = new Event(eventname.getText().toString());
+                            mEventAddedHandler.onItemAdded(event);
+
                             dismiss();
                         }
                     }
@@ -65,7 +62,7 @@ public class AddEventDialogFragment extends AppCompatDialogFragment {
         super.onAttach(activity);
 
         try {
-            mUserAddedHandler = (ItemAddedHandler) activity;
+            mEventAddedHandler = (ItemAddedHandler) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement OnArticleSelectedListener");
         }

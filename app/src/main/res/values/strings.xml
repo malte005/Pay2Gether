@@ -60,6 +60,7 @@
 
     <!-- Activity Edit Event -->
     <string name="title_activity_event_edit">Edit Event</string>
+    <string name="dialog_add_event_error">Event title is required...</string>
 
     <string name="action_settings">Settings</string>
 

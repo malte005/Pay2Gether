@@ -72,7 +72,12 @@
         <activity
             android:name=".friends.EditFriendActivity"
             android:label="@string/title_activity_user_edit"
-            android:parentActivityName=".friends.FriendsActivity" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".friends.FriendsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.maltedammann.pay2gether.pay2gether.friends.FriendsActivity" />
+        </activity>
         <activity
             android:name=".events.EventProfileActivity"
             android:label="@string/title_activity_event_profile"

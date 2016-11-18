@@ -10,6 +10,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatDialogFragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,6 +31,7 @@ import com.maltedammann.pay2gether.pay2gether.friends.FriendsActivity;
 import com.maltedammann.pay2gether.pay2gether.main.MainActivity;
 import com.maltedammann.pay2gether.pay2gether.model.Event;
 import com.maltedammann.pay2gether.pay2gether.model.User;
+import com.maltedammann.pay2gether.pay2gether.utils.AddEventDialogFragment;
 import com.maltedammann.pay2gether.pay2gether.utils.AuthUtils;
 import com.maltedammann.pay2gether.pay2gether.utils.UIHelper;
 import com.maltedammann.pay2gether.pay2gether.utils.extendables.BaseActivity;
@@ -41,7 +43,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import static com.maltedammann.pay2gether.pay2gether.events.RecyclerViewAdapterEvent.INTENT_EVENT_ID;
 import static com.maltedammann.pay2gether.pay2gether.friends.UserHolder.CONTEXT_DELETE_ENTRY;
 import static com.maltedammann.pay2gether.pay2gether.friends.UserHolder.CONTEXT_EDIT_ENTRY;
 
@@ -68,6 +69,7 @@ public class EventsActivity extends BaseActivity implements NavigationView.OnNav
 
     //Constants
     private static final String TAG = FriendsActivity.class.getSimpleName();
+    public static final String INTENT_EVENT_ID = "event_id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,7 +129,10 @@ public class EventsActivity extends BaseActivity implements NavigationView.OnNav
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                db.addEvent(new Event(date, "Titel bitch"));
+
+                AppCompatDialogFragment addEventFragment = new AddEventDialogFragment();
+                addEventFragment.show(getSupportFragmentManager(), "Add Event");
+
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -320,7 +325,7 @@ public class EventsActivity extends BaseActivity implements NavigationView.OnNav
     public void onItemAdded(Object event) {
         Event newEvent = (Event) event;
         db.addEvent(newEvent);
-        UIHelper.snack(findViewById(R.id.clFriends), newEvent.getTitle() + " added");
+        UIHelper.snack((View) findViewById(R.id.clEvents), newEvent.getTitle() + " added");
     }
 
     @Override
@@ -331,7 +336,6 @@ public class EventsActivity extends BaseActivity implements NavigationView.OnNav
         switch (item.getItemId()) {
             case CONTEXT_EDIT_ENTRY:
                 Intent go2Edit = new Intent(EventsActivity.this, EditEventActivity.class);
-                System.out.println("IDIDIDID:" + temp.getId());
                 go2Edit.putExtra(INTENT_EVENT_ID, temp.getId());
                 startActivity(go2Edit);
                 break;

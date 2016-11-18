@@ -306,7 +306,7 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
     public void onItemAdded(Object user) {
         User newUser = (User) user;
         db.addUser(newUser);
-        UIHelper.snack(findViewById(R.id.clFriends), newUser.getName() + " added");
+        UIHelper.snack((View) findViewById(R.id.clFriends), newUser.getName() + " added");
     }
 
     @Override

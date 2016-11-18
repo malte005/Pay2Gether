@@ -23,6 +23,7 @@ public class RecyclerViewAdapterUser extends RecyclerView.Adapter<UserHolder> {
     protected Context context;
     private User currentUser;
     private int currentPosition;
+
     // Constants
     public static final String INTENT_USER_ID = "user_id";
 

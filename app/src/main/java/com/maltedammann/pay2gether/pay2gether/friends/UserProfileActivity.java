@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.maltedammann.pay2gether.pay2gether.R;
 import com.maltedammann.pay2gether.pay2gether.control.DbUtils;
 import com.maltedammann.pay2gether.pay2gether.model.User;
@@ -20,11 +22,14 @@ public class UserProfileActivity extends AppCompatActivity {
     private FloatingActionButton fab;
 
     private String userID;
+    private User user = null;
 
     //DB
     private DbUtils dbUtils;
 
-    private User user = null;
+    //Firebase
+    private ValueEventListener mListener;
+    private DatabaseReference mRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,22 +65,60 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void getUser() {
-        dbUtils.mFirebaseDbReference.child(dbUtils.USER_REF).child(userID).addValueEventListener(new com.google.firebase.database.ValueEventListener() {
-            @Override
-            public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
-                user = snapshot.getValue(User.class);
-                System.out.println("USER: " + user.toString());
-                if (user.getName() != null) {
-                    setToolbar(); //TODO geht noch nicht
+        mRef = dbUtils.mFirebaseDbReference.child(dbUtils.USER_REF).child(userID);
+        if (mListener == null) {
+            mListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(com.google.firebase.database.DataSnapshot snapshot) {
+                    user = snapshot.getValue(User.class);
+                    System.out.println("USER: " + user.toString());
+                    if (user.getName() != null) {
+                        setToolbar(); //TODO geht noch nicht
+                    }
                 }
 
-            }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            };
+        }
+        mRef.addValueEventListener(mListener);
+    }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
+    @Override
+    public void onStart() {
+        super.onStart();
+        mRef.addValueEventListener(mListener);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mRef.addValueEventListener(mListener);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mListener != null) {
+            mRef.removeEventListener(mListener);
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mListener != null) {
+            mRef.removeEventListener(mListener);
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mListener != null) {
+            mRef.removeEventListener(mListener);
+        }
     }
 
     private void setToolbar() {
