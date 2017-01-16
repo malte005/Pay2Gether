@@ -1,4 +1,4 @@
-package com.maltedammann.pay2gether.pay2gether.friends;
+package com.maltedammann.pay2gether.pay2gether.user;
 
 import android.app.Activity;
 import android.app.LoaderManager;
@@ -18,10 +18,10 @@ import android.widget.SimpleCursorAdapter;
 
 import com.maltedammann.pay2gether.pay2gether.R;
 
-public class AddFriendActivity extends AppCompatActivity
+public class AddUserActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String TAG = AddFriendActivity.class.getSimpleName();
+    private static final String TAG = AddUserActivity.class.getSimpleName();
     private Toolbar toolbar;
     Intent returnIntent;
 
@@ -76,7 +76,7 @@ public class AddFriendActivity extends AppCompatActivity
                 String name = adapter.getCursor().getString(1);
                 //String mail = adapter.getCursor().getString(2);
                 returnIntent = new Intent();
-                returnIntent.putExtra(FriendsActivity.INTENT_DISPLAY_NAME, name);
+                returnIntent.putExtra(UserActivity.INTENT_DISPLAY_NAME, name);
                 setResult(Activity.RESULT_OK, returnIntent);
                 finish();
             }

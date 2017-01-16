@@ -24,7 +24,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.maltedammann.pay2gether.pay2gether.R;
 import com.maltedammann.pay2gether.pay2gether.control.DbUtils;
 import com.maltedammann.pay2gether.pay2gether.events.EventsActivity;
-import com.maltedammann.pay2gether.pay2gether.friends.FriendsActivity;
+import com.maltedammann.pay2gether.pay2gether.user.UserActivity;
 import com.maltedammann.pay2gether.pay2gether.model.User;
 import com.maltedammann.pay2gether.pay2gether.utils.AuthUtils;
 import com.maltedammann.pay2gether.pay2gether.utils.extendables.BaseActivity;
@@ -261,7 +261,7 @@ public class MainActivity extends BaseActivity
             Intent openEvents = new Intent(this, EventsActivity.class);
             startActivity(openEvents);
         } else if (id == R.id.nav_friends) {
-            Intent openFriends = new Intent(this, FriendsActivity.class);
+            Intent openFriends = new Intent(this, UserActivity.class);
             startActivity(openFriends);
         } else if (id == R.id.nav_logout) {
             alert = (AlertDialog) AuthUtils.showLogoutDeleteDialog(this, getString(R.string.signOutText), getString(R.string.signOut));

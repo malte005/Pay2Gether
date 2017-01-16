@@ -1,4 +1,4 @@
-package com.maltedammann.pay2gether.pay2gether.friends;
+package com.maltedammann.pay2gether.pay2gether.user;
 
 import android.content.Context;
 import android.content.Intent;

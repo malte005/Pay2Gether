@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.maltedammann.pay2gether.pay2gether.R;
@@ -16,11 +18,13 @@ import com.maltedammann.pay2gether.pay2gether.utils.FirebaseRefFactory;
 import com.maltedammann.pay2gether.pay2gether.utils.UIHelper;
 import com.maltedammann.pay2gether.pay2gether.utils.interfaces.ProgressDialogHandler;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.maltedammann.pay2gether.pay2gether.events.BillHolder.billName;
 import static com.maltedammann.pay2gether.pay2gether.events.EventHolder.eventName;
-import static com.maltedammann.pay2gether.pay2gether.friends.UserHolder.userName;
+import static com.maltedammann.pay2gether.pay2gether.user.UserHolder.userName;
 
 /**
  * Created by damma on 27.10.2016.
@@ -33,10 +37,8 @@ public class DbUtils implements ProgressDialogHandler {
 
     //Constants
     public final static String USER_REF = "users";
-    public final static String CHILD_REF_BILLS = "bills";
     public final static String BILL_REF = "bills";
     public final static String EVENT_REF = "events";
-    public final static String CHILD_REF_PARTICIPANTS = "participants";
 
     //Firebase instance variables
     private FirebaseDatabase mFirebaseDatabase;
@@ -44,8 +46,9 @@ public class DbUtils implements ProgressDialogHandler {
     private DatabaseReference mFirebaseReferenceUsers;
     private DatabaseReference mFirebaseReferenceEvents;
     private DatabaseReference mFirebaseReferenceBills;
-    private Firebase mFirebaseUserRef;
-    private Firebase mFirebaseEventsRef;
+    public Firebase mFirebaseUserRef = FirebaseRefFactory.getRef("users");
+    public Firebase mFirebaseEventsRef = FirebaseRefFactory.getRef("events");
+    public Firebase mFirebaseBillsRef = FirebaseRefFactory.getRef("bills");
 
     public DbUtils(Context c) {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -54,6 +57,31 @@ public class DbUtils implements ProgressDialogHandler {
     }
 
     // USER
+    public ArrayList<User> getAllUsers() {
+        final ArrayList<User> users = new ArrayList<User>();
+        final Firebase ref = FirebaseRefFactory.getRef().child(USER_REF);
+
+
+        ref.orderByChild("name").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                for (DataSnapshot user : snapshot.getChildren()) {
+                    users.add(user.getValue(User.class));
+                    System.out.println("Listener " + user.toString());
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+
+        System.out.println(users.size() + " users back");
+        return users;
+
+    }
+
     public String addUser(User user) {
         mFirebaseReferenceUsers = mFirebaseDbReference.child(USER_REF).push();
         String key = mFirebaseReferenceUsers.getKey();
@@ -65,8 +93,6 @@ public class DbUtils implements ProgressDialogHandler {
     public void deleteUser(String key) {
         pd = new ProgressDialog(context);
         showProgressDialog(context.getResources().getString(R.string.deleting));
-
-        mFirebaseUserRef = FirebaseRefFactory.getRef("users");
 
         mFirebaseUserRef.child(key).removeValue(new Firebase.CompletionListener() {
             @Override
@@ -124,11 +150,9 @@ public class DbUtils implements ProgressDialogHandler {
         return key;
     }
 
-    public void deleteEvent(String key) {
+    public void deleteEvent(final String key) {
         pd = new ProgressDialog(context);
         showProgressDialog(context.getResources().getString(R.string.deleting));
-
-        mFirebaseEventsRef = FirebaseRefFactory.getRef("events");
 
         mFirebaseEventsRef.child(key).removeValue(new Firebase.CompletionListener() {
             @Override
@@ -136,10 +160,16 @@ public class DbUtils implements ProgressDialogHandler {
                 if (firebaseError != null) {
                     System.out.println("Error deleting data: " + firebaseError.getMessage());
                 }
+                deleteAllRelatedBills(key);
                 hideProgressDialog();
                 UIHelper.snack(((Activity) context).findViewById(R.id.clEvents), eventName + " deleted");
             }
         });
+    }
+
+    private void deleteAllRelatedBills(String eventId) {
+        Firebase ref = (Firebase) mFirebaseBillsRef.orderByChild("eventId").equalTo(eventId);
+
     }
 
     public void editEvent(Event event) {
@@ -152,13 +182,25 @@ public class DbUtils implements ProgressDialogHandler {
         Map<String, Object> update = new HashMap<>();
         childUpdates.put("id", event.getId());
 
+        System.out.println("Event to update: " + event.toString());
+
         //update title
         if (event.getTitle() != null) {
+            System.out.println("Update title");
             childUpdates.put("title", event.getTitle());
+            System.out.println("Updated title");
+        }
+        //update time
+        if (event.getTime() != null) {
+            System.out.println("Update time: " + event.getTime());
+            childUpdates.put("time", event.getTime());
+            System.out.println("Updated time");
         }
         //update date
         if (event.getDate() != null) {
+            System.out.println("Update date: " + event.getDate());
             childUpdates.put("date", event.getDate());
+            System.out.println("Updated date");
         }
 
         update.put("/" + event.getId(), childUpdates);
@@ -177,12 +219,32 @@ public class DbUtils implements ProgressDialogHandler {
 
     // BIll
     public String addBill(Bill bill) {
-        mFirebaseReferenceBills = mFirebaseDbReference.child(EVENT_REF).push();
+        mFirebaseReferenceBills = mFirebaseDbReference.child(BILL_REF).push();
         String key = mFirebaseReferenceBills.getKey();
         bill.setId(key);
         mFirebaseReferenceBills.setValue(bill);
         return key;
     }
+
+    public void deleteBill(final String key) {
+        pd = new ProgressDialog(context);
+        showProgressDialog(context.getResources().getString(R.string.deleting));
+
+        mFirebaseBillsRef.child(key).removeValue(new Firebase.CompletionListener() {
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                if (firebaseError != null) {
+                    System.out.println("Error deleting data: " + firebaseError.getMessage());
+                }
+                hideProgressDialog();
+                UIHelper.snack(((Activity) context).findViewById(R.id.clEventProfile), billName + " deleted");
+            }
+        });
+    }
+
+
+    // BIll
+
 
     @Override
     public void showProgressDialog(String message) {

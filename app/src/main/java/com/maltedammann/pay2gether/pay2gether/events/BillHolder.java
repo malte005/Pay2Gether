@@ -1,4 +1,4 @@
-package com.maltedammann.pay2gether.pay2gether.friends;
+package com.maltedammann.pay2gether.pay2gether.events;
 
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -7,31 +7,35 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.maltedammann.pay2gether.pay2gether.R;
-import com.maltedammann.pay2gether.pay2gether.model.User;
+import com.maltedammann.pay2gether.pay2gether.model.Bill;
 import com.maltedammann.pay2gether.pay2gether.utils.interfaces.LongClickListener;
 
+import java.text.DecimalFormat;
+
 /**
- * Created by damma on 03.11.2016.
+ * Created by damma on 15.01.2017.
  */
 
-public class UserHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener, View.OnLongClickListener {
+public class BillHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener, View.OnLongClickListener {
 
     private View mView;
-    public static String userName;
-    private TextView textViewUserName;
+    public static String billName;
+    private TextView textViewBillName, textViewBillAmount, getTextViewBillOwner;
     private CardView cv;
     private LongClickListener longClickListener;
 
     //Constants
     public static final int CONTEXT_EDIT_ENTRY = 0;
     public static final int CONTEXT_DELETE_ENTRY = 1;
-    public final int PROFILE_FRIEND = 124;
+    public final int PROFILE_EVENT = 124;
 
-    public UserHolder(final View itemView) {
+    public BillHolder(final View itemView) {
         super(itemView);
-        cv = (CardView) itemView.findViewById(R.id.card_view_user);
+        cv = (CardView) itemView.findViewById(R.id.card_view_bill);
         mView = itemView;
-        textViewUserName = (TextView) itemView.findViewById(R.id.card_username);
+        textViewBillName = (TextView) itemView.findViewById(R.id.card_bill_name);
+        textViewBillAmount = (TextView) itemView.findViewById(R.id.card_bill_amount);
+        getTextViewBillOwner = (TextView) itemView.findViewById(R.id.card_bill_owner);
 
         itemView.setOnLongClickListener(this);
         itemView.setOnCreateContextMenuListener(this);
@@ -41,15 +45,16 @@ public class UserHolder extends RecyclerView.ViewHolder implements View.OnCreate
         this.longClickListener = cl;
     }
 
-    public void setAttributes(User user) {
-        textViewUserName = (TextView) mView.findViewById(R.id.card_username);
-        textViewUserName.setText(user.getName());
-        userName = user.getName();
+    public void setAttributes(Bill bill) {
+        textViewBillName.setText(bill.getTitle());
+        textViewBillAmount.setText(new DecimalFormat("#.00").format(bill.getAmount()));
+        getTextViewBillOwner.setText(bill.getOwnerId());
+        billName = bill.getTitle();
     }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        menu.setHeaderTitle("Edit friend");
+        menu.setHeaderTitle("Edit bill");
         menu.add(0, CONTEXT_EDIT_ENTRY, 0, "Edit");
         menu.add(0, CONTEXT_DELETE_ENTRY, 0, "Delete");
     }

@@ -1,4 +1,4 @@
-package com.maltedammann.pay2gether.pay2gether.friends;
+package com.maltedammann.pay2gether.pay2gether.user;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +15,7 @@ import com.maltedammann.pay2gether.pay2gether.R;
 import com.maltedammann.pay2gether.pay2gether.control.DbUtils;
 import com.maltedammann.pay2gether.pay2gether.model.User;
 
-public class EditFriendActivity extends AppCompatActivity {
+public class EditUserActivity extends AppCompatActivity {
 
     //DB
     private DbUtils dbUtils;
@@ -24,7 +24,7 @@ public class EditFriendActivity extends AppCompatActivity {
     private Toolbar toolbar;
 
     //Constants
-    private static final String TAG = EditFriendActivity.class.getSimpleName();
+    private static final String TAG = EditUserActivity.class.getSimpleName();
 
     private String userID;
     private User user = null;
@@ -50,7 +50,7 @@ public class EditFriendActivity extends AppCompatActivity {
         mail = (EditText) findViewById(R.id.editTextMail);
         dbUtils = new DbUtils(this);
 
-        userID = getIntent().getStringExtra(FriendsActivity.INTENT_USER_ID);
+        userID = getIntent().getStringExtra(UserActivity.INTENT_USER_ID);
 
         //Firebase init
         setupFirebase();

@@ -8,26 +8,31 @@ import java.util.List;
 
 public class Bill {
     private String id;
-    private float amount;
     private String title;
-    private Event event;
-    private User owner;
-    private List<User> belongers;
+    private float amount;
+    private String eventId;
+    private String ownerId;
+    private List<String> belongersId;
 
     public Bill() {
     }
 
-    public Bill(float amount, String title, Event event) {
-        this.amount = amount;
+    public Bill(String title, String eventid) {
         this.title = title;
-        this.event = event;
+        this.eventId = eventid;
     }
 
-    public Bill(float betrag, String title, Event event, User owner) {
-        this.amount = betrag;
+    public Bill(float amount, String title, String eventid) {
+        this.amount = amount;
         this.title = title;
-        this.event = event;
-        this.owner = owner;
+        this.eventId = eventid;
+    }
+
+    public Bill(float amount, String title, String eventid, User owner) {
+        this.amount = amount;
+        this.title = title;
+        this.eventId = eventid;
+        this.ownerId = owner.getId();
     }
 
     public String getId() {
@@ -54,28 +59,28 @@ public class Bill {
         this.title = title;
     }
 
-    public Event getEvent() {
-        return event;
+    public String getEventId() {
+        return eventId;
     }
 
-    public void setEvent(Event event) {
-        this.event = event;
+    public void setEventId(String event) {
+        this.eventId = event;
     }
 
-    public User getOwner() {
-        return owner;
+    public String getOwnerId() {
+        return ownerId;
     }
 
-    public void setOwner(User owner) {
-        this.owner = owner;
+    public void setOwnerId(User owner) {
+        this.ownerId = owner.getId();
     }
 
-    public List<User> getBelongers() {
-        return belongers;
+    public List<String> getBelongersId() {
+        return belongersId;
     }
 
-    public void setBelongers(List<User> belongers) {
-        this.belongers = belongers;
+    public void setBelongersId(List<String> belongers) {
+        this.belongersId = belongers;
     }
 
     @Override
@@ -84,9 +89,9 @@ public class Bill {
                 "id='" + id + '\'' +
                 ", amount=" + amount +
                 ", title='" + title + '\'' +
-                ", event=" + event +
-                ", owner=" + owner +
-                ", belongers=" + belongers +
+                ", event=" + eventId +
+                ", owner=" + ownerId +
+                ", belongers=" + belongersId +
                 '}';
     }
 }

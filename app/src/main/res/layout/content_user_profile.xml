@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.maltedammann.pay2gether.pay2gether.friends.UserProfileActivity"
+    tools:context="com.maltedammann.pay2gether.pay2gether.user.UserProfileActivity"
     tools:showIn="@layout/activity_user_profile">
 
     <LinearLayout
@@ -26,6 +26,4 @@
             android:paddingBottom="24dp" />
 
     </LinearLayout>
-
-
 </android.support.v4.widget.NestedScrollView>

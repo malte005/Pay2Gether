@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.maltedammann.pay2gether.pay2gether.R;
-import com.maltedammann.pay2gether.pay2gether.friends.UserProfileActivity;
 import com.maltedammann.pay2gether.pay2gether.model.Event;
 import com.maltedammann.pay2gether.pay2gether.utils.interfaces.LongClickListener;
 

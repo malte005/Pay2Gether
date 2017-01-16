@@ -1,6 +1,5 @@
 package com.maltedammann.pay2gether.pay2gether.model;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -9,7 +8,8 @@ import java.util.List;
 
 public class Event {
     private String id;
-    private Date date;
+    private String date;
+    private String time;
     private String title;
     private List<User> participants;
     private List<Bill> bills;
@@ -21,7 +21,7 @@ public class Event {
         this.title = title;
     }
 
-    public Event(Date date, String title) {
+    public Event(String date, String title) {
         this.date = date;
         this.title = title;
     }
@@ -34,11 +34,11 @@ public class Event {
         this.id = id;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
@@ -66,11 +66,20 @@ public class Event {
         this.bills = bills;
     }
 
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
     @Override
     public String toString() {
         return "Event{" +
                 "id='" + id + '\'' +
                 ", date=" + date +
+                ", time=" + time +
                 ", title='" + title + '\'' +
                 ", participants=" + participants +
                 ", bills=" + bills +

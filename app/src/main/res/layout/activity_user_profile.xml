@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.maltedammann.pay2gether.pay2gether.friends.UserProfileActivity">
+    tools:context="com.maltedammann.pay2gether.pay2gether.user.UserProfileActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"

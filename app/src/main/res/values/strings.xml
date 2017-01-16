@@ -52,15 +52,29 @@
     <string name="title_activity_user_edit">Edit Friend</string>
 
     <string name="action_save">Save</string>
+    <string name="action_edit_event">Edit</string>
 
-    <!-- Activity Event -->
+    <!-- Activity Events -->
     <string name="dialog_add_event_title">Title</string>
     <string name="dialog_add_event_msg">Create Event</string>
     <string name="title_activity_event_profile">EventProfileActivity</string>
 
+    <!-- Activity Event Profile -->
+    <string name="sum_of_event_bills">Sum of bills:</string>
+    <string name="bought_by">bought by </string>
+
     <!-- Activity Edit Event -->
     <string name="title_activity_event_edit">Edit Event</string>
     <string name="dialog_add_event_error">Event title is required...</string>
+
+    <!-- Activity Edit Event Add Bill -->
+    <string name="dialog_add_bill_msg">Create Bill</string>
+    <string name="dialog_add_bill_amount">Amount</string>
+    <string name="dialog_add_bill_name">Title</string>
+    <string name="dialog_add_bill_owner">Select Buyer</string>
+    <string name="dialog_add_bill_friends">Select Belongers</string>
+    <string name="dialog_add_bill_owner_header">Select Bill Owner</string>
+
 
     <string name="action_settings">Settings</string>
 

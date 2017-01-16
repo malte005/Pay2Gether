@@ -1,4 +1,4 @@
-package com.maltedammann.pay2gether.pay2gether.friends;
+package com.maltedammann.pay2gether.pay2gether.user;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -39,10 +39,10 @@ import com.maltedammann.pay2gether.pay2gether.utils.interfaces.ItemAddedHandler;
 
 import java.util.ArrayList;
 
-import static com.maltedammann.pay2gether.pay2gether.friends.UserHolder.CONTEXT_DELETE_ENTRY;
-import static com.maltedammann.pay2gether.pay2gether.friends.UserHolder.CONTEXT_EDIT_ENTRY;
+import static com.maltedammann.pay2gether.pay2gether.user.UserHolder.CONTEXT_DELETE_ENTRY;
+import static com.maltedammann.pay2gether.pay2gether.user.UserHolder.CONTEXT_EDIT_ENTRY;
 
-public class FriendsActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ItemAddedHandler {
+public class UserActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ItemAddedHandler {
 
     // Object Holder
     private ArrayList<User> users = new ArrayList<>();
@@ -57,7 +57,7 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
     private ChildEventListener mChildEventListener;
 
     //Constants
-    private static final String TAG = FriendsActivity.class.getSimpleName();
+    private static final String TAG = UserActivity.class.getSimpleName();
     public static final String INTENT_DISPLAY_NAME = "display_name";
     public static final String INTENT_USER_ID = "user_id";
     private final int ADD_FRIEND = 123;
@@ -95,7 +95,7 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
         // Fab init
         setupFab();
 
-        //Firebase Auth init
+        //Firebase init
         setupFirebase();
 
         //Refresh by pull down
@@ -228,7 +228,7 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent addFriend = new Intent(FriendsActivity.this, AddFriendActivity.class);
+                Intent addFriend = new Intent(UserActivity.this, AddUserActivity.class);
                 startActivityForResult(addFriend, ADD_FRIEND);
             }
         });
@@ -239,7 +239,7 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        adapter = new RecyclerViewAdapterUser(FriendsActivity.this, users);
+        adapter = new RecyclerViewAdapterUser(UserActivity.this, users);
         mRecyclerView.setAdapter(adapter);
 
         registerForContextMenu(mRecyclerView);
@@ -251,7 +251,7 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
                 if (addUser) {
                     users.add(dataSnapshot.getValue(User.class));
                 }
-                adapter = new RecyclerViewAdapterUser(FriendsActivity.this, users);
+                adapter = new RecyclerViewAdapterUser(UserActivity.this, users);
                 mRecyclerView.setAdapter(adapter);
                 adapter.notifyDataSetChanged();
             } catch (Exception ex) {
@@ -344,14 +344,11 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
         AlertDialog alert;
 
         if (id == R.id.nav_news) {
-            Intent openNewsFeed = new Intent(this, MainActivity.class);
-            startActivity(openNewsFeed);
             finish();
         } else if (id == R.id.nav_events) {
             Intent openEvents = new Intent(this, EventsActivity.class);
             startActivity(openEvents);
             finish();
-        } else if (id == R.id.nav_friends) {
         } else if (id == R.id.nav_logout) {
             alert = (AlertDialog) AuthUtils.showLogoutDeleteDialog(this, getString(R.string.signOutText), getString(R.string.signOut));
             alert.show();
@@ -372,7 +369,7 @@ public class FriendsActivity extends BaseActivity implements NavigationView.OnNa
         User temp = adapter.getSelectedItem(item);
         switch (item.getItemId()) {
             case CONTEXT_EDIT_ENTRY:
-                Intent go2Edit = new Intent(FriendsActivity.this, EditFriendActivity.class);
+                Intent go2Edit = new Intent(UserActivity.this, EditUserActivity.class);
                 System.out.println("IDIDIDID:" + temp.getId());
                 go2Edit.putExtra(INTENT_USER_ID, temp.getId());
                 startActivity(go2Edit);

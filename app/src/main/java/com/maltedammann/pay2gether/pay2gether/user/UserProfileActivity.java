@@ -1,4 +1,4 @@
-package com.maltedammann.pay2gether.pay2gether.friends;
+package com.maltedammann.pay2gether.pay2gether.user;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -42,7 +42,7 @@ public class UserProfileActivity extends AppCompatActivity {
         //UI
         TextView text = (TextView) findViewById(R.id.text);
         //get user ID
-        userID = getIntent().getStringExtra(FriendsActivity.INTENT_USER_ID);
+        userID = getIntent().getStringExtra(UserActivity.INTENT_USER_ID);
         //DB init
         dbUtils = new DbUtils(this);
         // User init
@@ -57,8 +57,8 @@ public class UserProfileActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent go2Edit = new Intent(UserProfileActivity.this, EditFriendActivity.class);
-                go2Edit.putExtra(FriendsActivity.INTENT_USER_ID, userID);
+                Intent go2Edit = new Intent(UserProfileActivity.this, EditUserActivity.class);
+                go2Edit.putExtra(UserActivity.INTENT_USER_ID, userID);
                 startActivity(go2Edit);
             }
         });

@@ -10,10 +10,11 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_margin="6dp"
-        card_view:cardBackgroundColor="@color/cardview_light_background"
+        android:layout_margin="5dp"
         android:foreground="?android:attr/selectableItemBackground"
+        android:elevation="3dp"
         card_view:cardCornerRadius="3dp"
+        card_view:cardBackgroundColor="@color/cardview_light_background"
         card_view:contentPadding="10dp">
 
         <TextView
